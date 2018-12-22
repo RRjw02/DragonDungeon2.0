@@ -14,3 +14,8 @@ Game.Level.clear = function(){
 	Game.Text;
 	Game.backBlock = undefined;
 }
+Game.Level.chooseRandom = function(){
+    
+}
+Game.Level.levels = [];
+	

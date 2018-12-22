@@ -5,6 +5,6 @@ Game.Screen.getWidth = function(){
 Game.Screen.getHeight = function(){
      return 700;
 }
-Game.Screen.rezise = function(width,height){
+Game.Screen.resize = function(width,height){
   window.resizeTo(width,height);
 }

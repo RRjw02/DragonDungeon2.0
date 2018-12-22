@@ -55,8 +55,11 @@ Game.File.getAllFilesInPath = function(path){
 if(typeof(Storage) !== "undefined"){
 	Game.Console.sendMessage("Loading WebStorage Modules. . . ");
 	Game.File.sessionStorage = {};
-	
-	
+	/**
+	* Sets a value to session
+	*
+	*
+	*/
 	Game.File.sessionStorage.set = function(key, value){
 		sessionStorage.setItem(key,value);
 	};

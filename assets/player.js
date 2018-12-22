@@ -45,5 +45,19 @@ Game.Teleport = function(x,y){
 	Game.player.y = y;
 	
 }
+/**
+* Sets the players Texture
+* @param {string} filename - the filename in assets/images
+*/
+Game.setPlayerSkin = function(filename){
+     Game.player.image.src = Game.File.getImageDirectory() + filename;
+}
+/**
+* Returns String of the current image the player is
+*/
+Game.getPlayerSkin = function(){
+     return Game.player.image.src;
+}
+	
 	
 	

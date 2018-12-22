@@ -1,6 +1,7 @@
 Game.levelTwo = function(){
 	Game.getCurrentMenu.current = "levelTwo";
-	Game.Level.clear();
+	Game.Demo();
+	
 	//Player is 20pixels by 20pixles at (x,y) (0,120)
 	Game.player.x = 60;
 	Game.player.y = 40;

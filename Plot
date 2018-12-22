@@ -1,0 +1,9 @@
+Project BuildName:    Dragon Dungeon 2.0
+
+Project Type: 2D Top Down Dungeon Crawler
+
+Themes: Exploration, rougelike, survival, arcane, etc. 
+
+Project Start:  Fall 2018 // Hypothetical sequel to Dragon Dungeon V1 by Noah Enger, 2016--
+
+Contributers: Me, You

@@ -22,5 +22,5 @@ Game.Level.randomLevel = function(){
     Game.getRandom(Game.Level.levels);
 }
 Game.Level.levels = {
-   1: Game.LevelOne,2: Game.levelTwo(), 3: Game.levelThree()
+   1: Game.levelOne(),2: Game.levelTwo(), 3: Game.levelThree()
 };

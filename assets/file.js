@@ -1,22 +1,38 @@
 Game.File = {};
+/*
+* Creates a file at directory (file should be inclided into the directory
+* @param {string} directory - the directory to file
+* @param {string} data - the stuff in the new file
+*/
 Game.File.Create = function(directory, data){
 fs.writeFile(directory,data, (err) => {
 	if (err) throw err;
 	console.log("Made " + data + " in " + directory);
 });
 };
+/**
+* Creates a new directory
+* @param {string} directory - the directory
+*/
 Game.File.CreateDir = function(directory){
 	fs.mkdir(directory, 511, function(err) {
 			if (err) throw err;
 	});
 };
+/**
+* returns everything in a file as a string
+* @param {string} directory - the directory and the filename
+*/
 Game.File.ReadFile = function(directory){
 	fs.readFile(directory, (err, data) => {
 		if (err) throw err;
 		return String(data);
 });
 };
-
+/**
+* Returns boolean if file exists
+* @param {string} directory - directory and filename
+*/
 Game.File.Exists = function(directory){
     fs.exists(directory,(exists) =>{
         if (exists){
@@ -28,18 +44,19 @@ Game.File.Exists = function(directory){
         }
     })
 };
-Game.File.ReadFileAsString = function(directory){
-	fs.readFile(directory, "utf8", (err, data) => {
-		if (err) throw err;
-		console.log(data);
-});
-};
+/**
+*
+* Returns every filename in a directory
+* @param {string} path - the path to the dirsctory
+*/
 Game.File.getAllFilesInPath = function(path){
     return fs.readdirSync(path);
 };
 if(typeof(Storage) !== "undefined"){
 	Game.Console.sendMessage("Loading WebStorage Modules. . . ");
 	Game.File.sessionStorage = {};
+	
+	
 	Game.File.sessionStorage.set = function(key, value){
 		sessionStorage.setItem(key,value);
 	};

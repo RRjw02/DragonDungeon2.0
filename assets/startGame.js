@@ -23,6 +23,3 @@ Game.getCurrentSubMenu = function(){
 Game.forceStart = function(){
 	Game.myGameArea.start();
 }
-Game.getRandomLevel = function(){
-	
-}

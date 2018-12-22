@@ -13,10 +13,10 @@ Most Important:
 Eventually:
 
 -Actual game character icon. I can draw something if needed.
--Display of enemy 
+
 
 Maybe?:
-
+-Display of enemy health using a canvas and slider
 
 
 ______________________________________
@@ -37,8 +37,12 @@ GAMEPLAY:
 
 Most Important:
 
+-Finishing levels 3, 4.
 
 Eventually:
+
+- Maybe dialogue boxes? games gotta have words. Dont know how that would work with java,
+maybe just use your on collision display a box with, well, words.
 
 
 Maybe?:

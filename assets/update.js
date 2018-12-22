@@ -2,15 +2,15 @@ Game.updateGameArea = function() {
     
 	if(!Game.isInMenu/* && Game.getCurrentMenu() == "levelOne"*/){
 		if(Game.player.crashWith(Game.winBlock)){
-			//Beat the level
-			if(Game.getCurrentMenu.current == "levelZero"){
-				Game.levelOne();
-			}else if(Game.getCurrentMenu.current == "levelOne"){
-				Game.levelTwo();
-			}else if(Game.getCurrentMenu.current == "levelTwo"){
-				Game.levelThree();
+			
+			/* if this dont work uncommemt
+			Game.forceStart();*/
+			if(Game.Level.current > 0){
+				Game.Level.current++;
+				Game.Level.randomLevel();
+			
 			}
-			Game.forceStart();
+			
 		}
 		if(Game.player.crashWith(Game.backBlock)){
 			//return to a level

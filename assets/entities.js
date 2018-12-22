@@ -13,6 +13,9 @@ Game.Entities.checkHit = function(other){
 	}
 	return false;
 }
+Game.EntityAI = {
+
+};
 /**
 * Returns an entity at (x,y)
 * @param {int} x - the x position to look for

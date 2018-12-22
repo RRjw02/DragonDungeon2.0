@@ -22,10 +22,10 @@ Game.Level.randomLevel = function(){
     Game.getRandom(Game.Level.levels);
 }
 Game.Level.levels = [];
-/*
-* Dont want the starting outside level to appear in the dungeon
-*Game.Level.level.push(Game.levelOne());
-*/
+
+
+Game.Level.level.push(Game.levelOne());
+
 Game.Level.level.push(Game.levelTwo());
 Game.Level.level.push(Game.levelThree());
 	

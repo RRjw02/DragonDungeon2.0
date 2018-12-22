@@ -15,7 +15,7 @@ Game.Level.clear = function(){
 	Game.backBlock = undefined;
 }
 Game.Level.chooseRandom = function(){
-    
+    Game.getRandom(Game.Level.levels);
 }
 Game.Level.levels = [];
 	

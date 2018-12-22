@@ -35,3 +35,15 @@ Game.Player.inventoryRefresh = function(){
 Game.getPlayerCoords = function(){
 	return "X: " + Game.player.x + " Y: " + Game.player.y;
 }
+/**
+* Teleports the player to x,y
+* @param {int} x - the new x position
+* @param {int} y - the new y position
+*/
+Game.Teleport = function(x,y){
+        Game.player.x = x;
+	Game.player.y = y;
+	
+}
+	
+	

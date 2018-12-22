@@ -24,12 +24,3 @@ Game.Level.randomLevel = function(){
 Game.Level.levels = {
    1: Game.LevelOne,2: Game.levelTwo(), 3: Game.levelThree()
 };
-	
-
-
-
-Game.Level.level.push(Game.levelOne());
-
-Game.Level.level.push(Game.levelTwo());
-Game.Level.level.push(Game.levelThree());
-	

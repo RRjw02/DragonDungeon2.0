@@ -17,8 +17,8 @@ Game.Level.clear = function(){
 /**
 * Chooses a random level and loads it into memory
 */
-
-Game.Level.chooseRandom = function(){
+Game.Level.current = 0;
+Game.Level.randomLevel = function(){
     Game.getRandom(Game.Level.levels);
 }
 Game.Level.levels = [];

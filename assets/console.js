@@ -14,6 +14,11 @@ Game.Console = {
     }
  }
 }
+
+/**
+* Sends messages, all uss same properties
+* @param {string} msg - the message to print to console
+**/
 Game.Console.sendMessage = function(msg){
     Game.Console.throwMessage(Game.Console.type(3),msg);
 }

@@ -1,3 +1,7 @@
+/*
+* Moves the player in different directions
+* @param {string} dir - the direction to move "up" "down" "left" "right"
+*/
 function move(dir){
 	if(Game.paused || Game.player.canMove){
 		if(dir=="left"){
@@ -63,6 +67,11 @@ function move(dir){
 		}
 	}
 }
+/*
+* Moves another gameobject across the screen
+* @param {object} other - the other gameobject
+* @param {string} dir - direction to move same as move()
+*/
 function moveOther(other,dir){
 	if(dir=="left"){
 		other.x -= 20;
@@ -82,6 +91,10 @@ function moveOther(other,dir){
 		Game.player.facing = "north";
 	}
 }
+/**
+* BROKEN
+*
+*/
 //UNUSED too smooth oof
 function Smoothmove(dir){
 	if(dir=="left"){
@@ -117,7 +130,11 @@ function Smoothmove(dir){
 		Game.player.speedY = 0;
 	}
 }
-//Detects the input from a keyboard using ROT.MIN.JS
+/**
+ *
+ * Detects the input from a keyboard using ROT.MIN.JS
+ * no need to call this, it automatically is called when a key event
+ */
 Game.handleInput = function(inputType, inputData){
 	if(!Game.isInMenu){
 		//If ingame and not in the menu

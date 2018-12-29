@@ -1,9 +1,8 @@
 Game.levelOne = function(){
 	Game.getCurrentMenu.current = "levelOne";
 	Game.Level.clear();
-	//Player is 20pixels by 20pixles at (x,y) (0,120)
-	Game.player.x = 60;
-	Game.player.y = 40;
+	Game.Teleport(Game.Level.pos.level1_enter.x,Game.Level.pos.level1_enter.y);
+	
 	Game.player.facing = "east";
 	//BackGround
 	Game.createBackgroundPrefix();
@@ -119,7 +118,9 @@ Game.levelOne = function(){
 		Game.createDoor(80,140);
 		Game.createDoor(180,180);
 		Game.createDoor(240,140);
-		Game.createDoor(380,40);
+		
+		
+		
 		Game.createHiddenDoor(360,140);
 		Game.createHiddenDoor(360,240);
 		Game.createHiddenDoor(360,160,"dirt_texture.jpg");
@@ -136,7 +137,7 @@ Game.levelOne = function(){
 		
 	Game.wallPrefix();
 	
-	Game.winBlock = new Game.GameObject(20,20,Game.File.getImageDirectory() + "door_texture.jpg", 950, 100,"image");
+	Game.winBlock = new Game.GameObject(20,20,Game.File.getImageDirectory() + "door_texture.jpg", 380,40,"image");
 	Game.backBlock = new Game.GameObject(20,20,Game.File.getImageDirectory() + "door_texture.jpg",60,20,"image");
 	Game.createWall(40,20);
 	Game.createWall(20,20);

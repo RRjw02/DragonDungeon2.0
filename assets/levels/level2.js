@@ -1,10 +1,8 @@
 Game.levelTwo = function(){
 	Game.getCurrentMenu.current = "levelTwo";
-	Game.Demo();
-	
-	//Player is 20pixels by 20pixles at (x,y) (0,120)
+	Game.Level.clear();
 	Game.Teleport(60,40);
-	
+	Game.wallPrefix();
 	Game.player.facing = "east";
 	//BackGround
 	Game.createBackgroundPrefix();

@@ -1,21 +1,15 @@
-Game.levelZero = function(){
-	Game.getCurrentMenu.current = "levelZero";
-	if(Game.Level.previous.length > 1){
-		Game.Level.clear();
-	}
-	//Player is 20pixels by 20pixles at (x,y) (0,120)
-	Game.player.facing = "east";
+Game.bossLevel = function(){
+	Game.Level.inBossFight = true;
+	Game.Level.clear();
 	//BackGround
-	Game.createBackgroundPrefix("grass.png");
+	Game.createBackgroundPrefix("dirt_texture.jpg");
+	
+	//prevents an inventory bug
 	Game.openInventory();
 	Game.closeInventory();
 	
-	Game.wallPrefix("dirt_texture.jpg");
-	Game.createTree(60,100);
-	Game.createTree(100,80);
-	Game.createTree(60,160);
-	Game.createTree(160,220);
-	
+	Game.wallPrefix("brick_texture.png");
+	Game.Entities.Boss.create(200,200,"dragon_texture.png",25*Game.Level.nextBoss,Game.Level.nextBoss / 4,4);
 	Game.createWall(960,120);
 	Game.createWall(960,80);
 	Game.createWall(980,120);
@@ -30,6 +24,7 @@ Game.levelZero = function(){
 	Game.createBackground(940,80);
 	Game.createBackground(940,100);
 	Game.createBackground(940,120);
+	Game.bossBlock = new Game.GameObject(20,20,Game.Textures.brick.src,940,100,"image",true);
 	Game.winBlock = new Game.GameObject(20,20,Game.File.getImageDirectory() + "door_texture.jpg", 960, 100,"image");
 	Game.backBlock = new Game.GameObject(20,20,Game.File.getImageDirectory() + "door_texture.jpg",99999,99999,"image");
 }

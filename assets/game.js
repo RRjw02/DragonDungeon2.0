@@ -1,47 +1,49 @@
-window.resizeTo(1200,700);
 //Define all varables here for use by the game
 Game = {};
-Game.player;
+//Booleans
 Game.dev = false;
+Game.Died = false;
+Game.pause = false;
+Game.beatLevel = false;
+Game.isInMenu = true;
+Game.AlreadyInMenu = false;
+Game.hasBinded = false;
+//Integers
+Game.highestLevel = 1;
+//GameObjects
+Game.player;
+Game.backBlock;
+Game.bossBlock;
+Game.winBlock;
+Game.Text;
+Game.menuSelector;
+Game.Selected;
+Game.menuButton_startGame;
+Game.menuText_startGame;
+Game.menuButton_shop;
+Game.menuText_shop;
+Game.menuButton_options;
+Game.menuText_options;
+Game.menuButton_about;
+Game.menuText_options;
 Game.GameObjects = [];
 Game.Walls = [];
-Game.Died = false;
-Game.backBlock;
-Game.Text;
 Game.Backgrounds = [];
 Game.Dangers = [];
 Game.triggers = [];
 Game.chests = [];
-Game.pause = false;
-Game.highestLevel = 1; //so you only can access level 1 when you first load the game.
-Game.beatLevel = false;
-Game.winBlock;
-//Menu Varables
-Game.isInMenu = true;
-Game.menuSelector;
-Game.Selected;
-Game.AlreadyInMenu = false;
 Game.menuObjects = [];
-
-Game.menuButton_startGame;
-Game.menuText_startGame;
-
-Game.menuButton_shop;
-Game.menuText_shop;
-
-Game.menuButton_options;
-Game.menuText_options;
-
-Game.menuButton_about;
-Game.menuText_options;
-
-
 Game.Texts = [];
-Game.hasBinded = false;
 
+//When the executable loads
+(function(){
+	window.resizeTo(1200,700);
+})
+
+//Miscellaneous functions
 Game.isObject = function(variable){
 	var variable;
-	if(variable instanceof Object){
+	if(typeof variable == "Object"){
 		return true;
 	}else{
 		return false;
@@ -49,7 +51,7 @@ Game.isObject = function(variable){
 };
 Game.isString = function(variable){
 	var variable;
-	if(variable instanceof String){
+	if(typeof variable == "String"){
 		return true;
 	}else{
 		return false;

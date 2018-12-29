@@ -3,34 +3,23 @@ Game.updateGameArea = function() {
 	if(!Game.isInMenu/* && Game.getCurrentMenu() == "levelOne"*/){
 		if(Game.player.crashWith(Game.winBlock)){
 			//Beat the level
-			if(Game.getCurrentMenu.current == "levelZero"){
-				Game.levelOne();
-			}else if(Game.getCurrentMenu.current == "levelOne"){
-				Game.levelTwo();
-			}else if(Game.getCurrentMenu.current == "levelTwo"){
-				Game.levelThree();
-			}
+			Sound.Ambient.play();
+			Game.Level.depth++;
+			Game.randomLevel();
 			Game.forceStart();
 		}
-		if(Game.player.crashWith(Game.backBlock)){
+		/*if(Game.player.crashWith(Game.backBlock)){
 			//return to a level
-			if(Game.getCurrentMenu.current == "levelOne"){
-				Game.Level.clear();
-				Game.levelZero();
-				Game.player.x = 940;
-				Game.player.y = 100;
-			}else if(Game.getCurrentMenu.current == "levelTwo"){
-				Game.Level.clear();
-				Game.levelOne();
-				Game.player.x = 20;
-				Game.player.y = 120;
-			}else if(Game.getCurrentMenu.current == "levelThree"){
-				Game.Level.clear();
-				Game.levelTwo();
-				Game.player.x = 20;
-				Game.player.y = 120;
-			}
+			Game.loadPreviousLevel();
 			Game.forceStart();
+		}*/
+		if(Game.onDroppedItem() && Game.oof){
+			Game.oof = false;
+			Game.Dialog.displayItemStats(Game.getDroppedItem());
+		}
+		if(Game.chestCheck() && Game.oof){
+			Game.oof = false;
+			Game.Dialog.displayChestText();
 		}
 		for (i = 0; i < Game.Dangers.length; i += 1) {
 			if (Game.player.crashWith(Game.Dangers[i])) {
@@ -71,11 +60,17 @@ Game.updateGameArea = function() {
 			for(var i = 0; i < Game.Entities.inGame.length; i += 1){
 				Game.Entities.inGame[i].update();
 			}
+			Game.Dialog.update();
 			Game.player.update();
 			//Standard texts
 			Game.Texts[0].text = "Health: " + Game.player.health;
 			Game.Texts[1].text = "Attack: " + Game.player.damagePerHit;
 			Game.Texts[2].text = "Score: " + Game.player.score;
+			if(Game.Level.inBossFight){
+				Game.Texts[2].text ="Boss Health: " + Game.Entities.inGame[Game.Entities.inGame.length - 1].health;
+			}else{
+				Game.Texts[2].text = "Score: " + Game.player.score;
+			}
 			for(var i = 0; i < Game.Texts.length; i += 1){
 				Game.Texts[i].update();
 			}
@@ -144,9 +139,6 @@ Game.everyinterval = function(n) {
     return false;
 }
 
-Game.accelerate = function(n) {
-    Game.player.gravity = n;
-}
 Game.DangerTick = function(dangerObject){
 	var x = dangerObject.x;
 	var y = dangerObject.y;

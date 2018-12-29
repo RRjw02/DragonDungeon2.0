@@ -20,11 +20,84 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 				this.heldItem = null;
 		}
 	}
+	if(type == "entity"){
+		this.cooldown = false;
+		this.count = 0;
+		this.speed = 3;
+		this.wallCheck = function(){
+			if(this.noclip){
+				//code when noclip is on
+				return false;
+			}else{
+				return Game.hitWallCheck(this);
+			}
+		}
+		this.AI = function(){
+			var player = Game.player;
+			if(this.speed != "none"){
+				if(this.y >= player.y){
+					this.y = this.y - 20;
+					//Check to see if the ai hit a wall
+					if(this.wallCheck()){
+						this.y = this.y + 20
+					}
+				}else if(this.y <= player.y){
+					this.y = this.y + 20;
+					//Check to see if the ai hit a wall
+					if(this.wallCheck()){
+						this.y = this.y - 20;
+					}
+				}
+				if(this.x >= player.x){
+					this.x = this.x - 20;
+					//Check to see if the ai hit a wall
+					if(this.wallCheck()){
+						this.x = this.x + 20;
+					}
+				}else if(this.x <= player.x){
+					this.x = this.x + 20;
+					//Check to see if the ai hit a wall
+					if(this.wallCheck()){
+						this.x = this.x - 20;
+					}
+				}
+				//Check to see if the ai has caught a entity and deal
+				//Damage to the entity
+				//if(this.checkForEntities()){
+				//	var ent = Game.Entities.getEntity(this.x,this.y);
+				//	this.dealDamage(ent);
+				//}
+			}
+			//End of this.AI
+		}
+		
+	}
 	if(type == "player" || type == "entity"){
+		if(type == "player"){
+			this.isPlayer = true;
+		}else{
+			this.isPlayer = false;
+		}
+		this.checkForEntities = function(){
+			//Check for player;
+			if(type != "player" && this.crashWith(Game.player)){
+				return true;
+			}
+			//Check for the rest of the entities
+			for(var i = 0; i < Game.Entities.inGame.length; i++){
+				if(this.crashWith(Game.Entities.inGame[i])){
+					return true;
+				}
+			}
+			return false;
+		}
+		this.noclip = false;
 		this.creatureType = creatureType;
 		this.canMove = true;
-		if(this.creatureType == "Mimic" || this.creatureType == "Goblin"){
+		if(this.creatureType == "Mimic"){
 			this.canMove = false;
+		}
+		if(this.creatureType == "Mimic" || this.creatureType == "Goblin" || this.creatureType == "boss"){
 			this.image = new Image();
 			this.image.src = color;
 		}
@@ -37,6 +110,7 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 			return this.health;
 		}
 		this.takeDamage = function(num){
+			Sound.onDeath.play();
 			this.health -= num;
 			if(this.health <= 0){
 				this.isDead = true;
@@ -44,6 +118,10 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 			}
 		}
 		this.dealDamage = function(other){
+			if(this.isPlayer){
+				Game.Dialog.combat();
+				this.takeDamage(other.damagePerHit);
+			}
 			other.takeDamage(this.damagePerHit);
 		}
 		this.dropItem = function(item,slot){
@@ -63,6 +141,7 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 		}
 		this.onDeath = function(other){
 			if(this.type == "player"){
+				Game.Dialog.setText("You Died!", 3, "red");
 				this.canDoDamage = false;
 				this.isHidden = true;
 				this.canMove = false;
@@ -72,6 +151,7 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 				//location.reload();
 			}else if(this.type == "entity"){
 				this.dropItem();
+				Game.player.score += 15;
 				this.canDoDamage = false;
 				this.canMove = false;
 				this.isWall = false;
@@ -79,6 +159,11 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 				if(other != null){
 					other = null;
 				}
+			}else if(this.creatureType == "boss"){
+				Game.Level.inBossFight = false;
+				var reward = Game.getRandomItem();
+				Game.Dialog.setText("Boss beaten! Reward: " + reward.trueName, 3, "green");
+				this.dropItem(reward);
 			}
 		}
 	}
@@ -113,8 +198,9 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 		}
 		this.useItem = function(num){
 			if(num <= this.maxInventorySize){
-				this.inventory[num - 1].use();
-				if(this.inventory[num - 1].isConsumable){
+				var Item = this.inventory[num - 1];
+				Item.use();				
+				if(Item.isConsumable){
 					this.inventory[num - 1] = null;
 				}
 			}else{
@@ -169,12 +255,16 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 		this.image = new Image();
 		this.image.src = color;
 	}
-	
+	this.setImage = function(file){
+		this.image = new Image();
+		this.image.src = Game.File.getImageDirectory() + file;
+	}
 	
 	this.facing = "east";
 	this.score = 0;
 	this.bounce = 0.6;
 	this.speed = 1;
+	this.color = color;
 	this.width = width;
 	this.height = height;
 	this.speedX = 0;
@@ -189,17 +279,17 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 	this.update = function() {
 		if(!this.isHidden){
 			ctx = Game.myGameArea.context;
-			if (type == "image" || type == "chest" || type == "wall" || type == "door" || this.creatureType == "Mimic" || this.creatureType == "Goblin" || type == "droppedItem") {
+			if (this.image != null) {
 				ctx.drawImage(this.image, 
 				this.x, 
 				this.y,
 				this.width, this.height);
 			}else if (this.type == "text") {
 				ctx.font = this.width + " " + this.height;
-				ctx.fillStyle = color;
+				ctx.fillStyle = this.color;
 				ctx.fillText(this.text, this.x, this.y);
 				}else {
-				ctx.fillStyle = color;
+				ctx.fillStyle = this.color;
 				ctx.fillRect(this.x, this.y, this.width, this.height);
 			}
 		}else{
@@ -243,214 +333,17 @@ Game.GameObject = function(width, height, color, x, y, type, isWall,creatureType
 	}
 }
 
-Game.hitWallCheck = function(other){
-	for(var i = 0; i < Game.Walls.length; i++){
-		if(other.crashWith(Game.Walls[i])){
-			return true;
-		}
-	}
-	for(var i = 0; i < Game.GameObjects.length; i++){
-		if(other.crashWith(Game.GameObjects[i]) && Game.GameObjects[i].isWall){
-			return true;
-		}
-	}
-	return false;
-}
 
-//Trigger Functions
-Game.createTrigger = function(x,y,isHidden,triggeredFunction){
-	var temp = new Game.GameObject(20, 20, "blue", x, y, "trigger", false);
-	temp.triggerFunction = triggeredFunction;
-	temp.isHidden = isHidden;
-	Game.triggers.push(temp);	
-	Game.Console.sendMessage("Trigger created at: X: " + temp.x + " Y: " + temp.y);
-}
-Game.getTrigger = function(x,y){
-	for(var i = 0; i < Game.triggers.length; i++){
-		if(Game.triggers[i].type == "trigger" && Game.triggers[i].x == x && Game.triggers[i].y == y){
-			return Game.triggers[i];
-		}
-	}
-	return false;
-}
-Game.showAllTriggers = function(){
-	for(var i = 0; i < Game.triggers.length; i++){
-		Game.triggers[i].isHidden = false;
-	}
-}
-Game.hideAllTriggers = function(){
-	for(var i = 0; i < Game.triggers.length; i++){
-		Game.triggers[i].isHidden = true;
-	}
-}
-
-//----------------------------------------------------------------------------------------
-//Wall functions
-Game.createWall = function(x,y,texture){
-	if(texture != null){
-		Game.GameObjects.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + texture,x,y,"wall",true));	
-	}else{
-		Game.GameObjects.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + "dungeon_wall_20x20.jpg",x,y,"wall",true));
-	}
-	var obj = Game.GameObjects[Game.GameObjects.length - 1];
-	Game.Console.sendMessage("Wall created at: X: " + obj.x + " Y: " + obj.y);
-}
-Game.createTree = function(x,y,texture){
-	if(texture != null){
-		Game.GameObjects.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + texture,x,y,"wall",true));	
-	}else{
-		Game.GameObjects.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + "tree_texture.png",x,y,"wall",true));
-	}
-	var obj = Game.GameObjects[Game.GameObjects.length - 1];
-	Game.Console.sendMessage("Tree created at: X: " + obj.x + " Y: " + obj.y);
-}
-Game.getWall = function(x,y){
-	for(var i = 0; i < Game.GameObjects.length; i++){
-		if(Game.GameObjects[i].type == "wall" && Game.GameObjects[i].x == x && Game.GameObjects[i].y == y){
-			return Game.GameObjects[i];
-		}
-	}
-	return false;
-}
-Game.createBackground = function(x,y,texture){
-	if(texture != null){
-		Game.Backgrounds.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + texture,x,y,"image"));
-	}else{
-		Game.Backgrounds.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + "dungeon_floor.jpg",x,y,"image"));
-	}
-}
-//Door that looks like a wall
-Game.createHiddenDoor = function(x,y,texture){
-	if(texture != null){
-		Game.GameObjects.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + texture,x,y,"door",false));
-	}else{
-		Game.GameObjects.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + "dungeon_wall_20x20.jpg",x,y,"door",false));
-	}
-	var obj = Game.GameObjects[Game.GameObjects.length - 1];
-	Game.Console.sendMessage("Hidden Door created at: X: " + obj.x + " Y: " + obj.y);
-	//create the triggers for the open/close of the doors
-	Game.createTrigger(x,y-20,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x,y-40,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-		
-	Game.createTrigger(x,y+20,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x,y+40,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	
-	Game.createTrigger(x+20,y,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x+40,y,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	
-	Game.createTrigger(x-20,y,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x-40,y,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-}
-
-//----------------------------------------------------------------------------------------
-//Door functions
-Game.createDoor = function(x,y){
-	Game.GameObjects.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + "door_texture.jpg",x,y,"door",false));
-	var obj = Game.GameObjects[Game.GameObjects.length - 1];
-	Game.Console.sendMessage("Door created at: X: " + obj.x + " Y: " + obj.y);
-	//create the triggers for the open/close of the doors
-	Game.createTrigger(x,y-20,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x,y-40,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-		
-	Game.createTrigger(x,y+20,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x,y+40,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	
-	Game.createTrigger(x+20,y,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x+40,y,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x+20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	
-	Game.createTrigger(x-20,y,true,function(){Game.getDoor(x,y).isHidden = true;});
-	Game.createTrigger(x-40,y,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y+20,true,function(){Game.getDoor(x,y).isHidden = false;});
-	Game.createTrigger(x-20,y-20,true,function(){Game.getDoor(x,y).isHidden = false;});
-}
-Game.getDoor = function(x,y){
-	for(var i = 0; i < Game.GameObjects.length; i++){
-		if(Game.GameObjects[i].type == "door" && Game.GameObjects[i].x == x && Game.GameObjects[i].y == y){
-			return Game.GameObjects[i];
-		}
-	}
-	return false;
-}
-
-Game.removeWall = function(x,y){
-	for(var i = 0; i < Game.GameObjects.length; i++){
-		if(Game.GameObjects[i].isWall == true && Game.GameObjects[i].x == x && Game.GameObjects[i].y == y){   
-			//Hide the wall and make it not a wall to disable the wall check;
-			Game.GameObjects[i].isHidden = true;
-			Game.GameObjects[i].type = "image";
-		}
-	}
-}
-
-//Text Functions
-
-Game.createText = function(line, msg){
-	var x = line * 20;
-	Game.Texts.push(new Game.GameObject("20px","Consolas","black",100,x,"text"));
-	Game.Texts[Game.Texts.length - 1].text = msg;
-}
-
-
-//Game Functions
-Game.dropItem = function(x,y){
-	var itemObj = new Game.GameObject(20,20,Game.File.getImageDirectory() + "droppedItem_texture.png",x,y,"droppedItem");
-	itemObj.heldItem = Game.getRandomItem();
-	Game.GameObjects.push(itemObj);
-	Game.Console.sendMessage("droppedItem created at: X: " + itemObj.x + " Y: " + itemObj.y + " Containing: " + itemObj.heldItem.trueName);
-}
-//----------------------------------------------------------------------------------------
-//Dialog Item functions
-//TODO
-Game.createDialogItem = function(x,y,onTrigger){
-	
-}
-Game.getDialogItem = function(x,y){
-	
-}
-//Chest functions
-Game.createChest = function(x,y,contents){
-	Game.chests.push(new Game.GameObject(20,20,Game.File.getImageDirectory() + "chest_texture.png",x,y,"chest"));
-	var obj = Game.chests[Game.chests.length - 1];
-	Game.Console.sendMessage("Chest created at: X: " + obj.x + " Y: " + obj.y);
-	for(var i = 0; i < contents.length; i++){
-		Game.chests[Game.chests.length - 1].setContents(contents[i]);
-	}
-}
-Game.getChest = function(x,y){
-	for(var i = 0; i < Game.chests.length; i++){
-		if(Game.chests[i].type == "chest" && Game.chests[i].x == x && Game.chests[i].y == y){
-			return Game.chests[i];
-		}
-	}
-	return false;
-}
-Game.checkChest = function(num){
-	if(Game.getChest(Game.player.x,Game.player.y) != null && Game.getChest(Game.player.x,Game.player.y).getContents(num ) != null){
-		return Game.getChest(Game.player.x,Game.player.y).getContents(num).trueName;
-	}else{
-		return "Empty";
-	}
-	
-}
 Game.openChest = function(chest){
 	Game.player.canMove = false;
 	Game.pause = true;
 	Game.getCurrentSubMenu.current = "chest";
 	var temp = Game.inventoryText;
+	temp.line1.color = "green";
+	temp.line2.color = "green";
+	temp.line3.color = "green";
+	temp.line4.color = "green";
+	temp.line5.color = "green";
 	temp.line1.text = "Chest: ";
 	temp.line2.text = "[1]: " + Game.checkChest(1);
 	temp.line3.text = "[2]: " + Game.checkChest(2);
@@ -582,7 +475,3 @@ Game.DeveloperMode = function(){
 	Game.dev = true;
 	Game.showAllTriggers();
 }
-
-Game.createText(2,"Health: ");
-Game.createText(3,"Attack: ");
-Game.createText(4,"Score: ");

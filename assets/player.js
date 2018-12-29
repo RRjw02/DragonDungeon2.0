@@ -41,7 +41,7 @@ Game.getPlayerCoords = function(){
 * @param {int} y - the new y position
 */
 Game.Teleport = function(x,y){
-        Game.player.x = x;
+    Game.player.x = x;
 	Game.player.y = y;
 	
 }

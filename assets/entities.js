@@ -1,6 +1,10 @@
 Game.Entities = {};
+
+
 //All the entities in game excluding the player
 Game.Entities.inGame = [];
+
+
 /**
 * Checks to see if an gameobject hit an entity
 * @param {object} other - the GameObject you wanna check to see if it hit a entity
@@ -38,6 +42,7 @@ Game.Entities.createBull = function(x,y,health){
 	temp.y = y;
 	temp.damagePerHit = 3;
 	temp.health = health;
+	temp.speed = 5;
 	Game.Entities.inGame.push(temp);
 }
 /**
@@ -51,6 +56,7 @@ Game.Entities.createBat = function(x,y,health){
 	temp.x = x;
 	temp.y = y;
 	temp.damagePerHit = 1;
+	temp.speed = 1;
 	temp.health = health;
 	Game.Entities.inGame.push(temp);
 }
@@ -66,6 +72,7 @@ Game.Entities.createMimic = function(x,y,health){
 	temp.y = y;
 	temp.damagePerHit = 2;
 	temp.health = health;
+	temp.speed = "none";
 	Game.Entities.inGame.push(temp);
 }
 /**
@@ -80,5 +87,17 @@ Game.Entities.createGoblin = function(x,y,health){
 	temp.y = y;
 	temp.damagePerHit = 1;
 	temp.health = health;
+	temp.speed = 2;
+	Game.Entities.inGame.push(temp);
+}
+Game.Entities.Boss = {};
+Game.Entities.Boss.create = function(x,y,sprite,health,dph,speed){
+	var temp = new Game.GameObject(20,20,Game.File.getImageDirectory() + sprite,0,0,"entity", true, "Boss");
+	temp.setImage(sprite);
+	temp.x = x;
+	temp.y = y;
+	temp.damagePerHit = dph;
+	temp.health = health;
+	temp.speed = speed;
 	Game.Entities.inGame.push(temp);
 }

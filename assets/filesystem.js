@@ -5,10 +5,10 @@ Game.File.getDirectory = function(){
 	return "assets/";
 };
 Game.File.getLevelDirectory = function(){
-	return Game.File.getDirectory() + Game.File.getDirectory() + "levels/";
+	return Game.File.getDirectory() + "levels/";
 };
 Game.File.getSoundDirectory = function(){
-	return Game.File.getDirectory() + Game.File.getDirectory() + "audio/";
+	return Game.File.getDirectory() + "sounds/";
 };
 Game.File.getImageDirectory = function(){
 	return Game.File.getDirectory() + "images/";

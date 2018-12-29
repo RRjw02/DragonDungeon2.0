@@ -3,16 +3,20 @@
 * @param {string} dir - the direction to move "up" "down" "left" "right"
 */
 function move(dir){
+	Game.Dialog.hide();
+	Game.oof = true;
 	if(Game.paused || Game.player.canMove){
+		//AI tick
+		Game.AI.tick();
 		if(dir=="left"){
 			Game.player.x = Game.player.x - 20;
 			move("stop");
-			if(Game.hitWallCheck(Game.player)){
+			if(Game.hitWallCheck(Game.player) || Game.player.crashWith(Game.backBlock)){
 				Game.player.x = Game.player.x + 20;
 				move("stop");
 			}else if(Game.Entities.checkHit(Game.player)){
+				Game.Dialog.combat();
 				var other = Game.Entities.getEntity(Game.getPlayerX(),Game.getPlayerY());
-				Game.player.takeDamage(other.damagePerHit);
 				Game.player.dealDamage(other);
 				Game.player.x = Game.player.x + 20;
 				move("stop");
@@ -22,12 +26,12 @@ function move(dir){
 		}else if(dir=="right"){
 			Game.player.x = Game.player.x + 20;
 			move("stop");
-			if(Game.hitWallCheck(Game.player)){
+			if(Game.hitWallCheck(Game.player) || Game.player.crashWith(Game.backBlock)){
 				Game.player.x = Game.player.x - 20;
 				move("stop");
 			}else if(Game.Entities.checkHit(Game.player)){
+				Game.Dialog.combat();
 				var other = Game.Entities.getEntity(Game.getPlayerX(),Game.getPlayerY());
-				Game.player.takeDamage(other.damagePerHit);
 				Game.player.dealDamage(other);
 				Game.player.x = Game.player.x - 20;
 				move("stop");
@@ -37,12 +41,12 @@ function move(dir){
 		}else if(dir=="down"){
 			Game.player.y = Game.player.y + 20;
 			move("stop");
-			if(Game.hitWallCheck(Game.player)){
+			if(Game.hitWallCheck(Game.player) || Game.player.crashWith(Game.backBlock)){
 				Game.player.y = Game.player.y - 20;
 				move("stop");
 			}else if(Game.Entities.checkHit(Game.player)){
 				var other = Game.Entities.getEntity(Game.getPlayerX(),Game.getPlayerY());
-				Game.player.takeDamage(other.damagePerHit);
+				Game.Dialog.combat();
 				Game.player.dealDamage(other);
 				Game.player.y = Game.player.y - 20;
 				move("stop");
@@ -52,12 +56,12 @@ function move(dir){
 		}else if(dir=="up"){
 			Game.player.y = Game.player.y - 20;
 			move("stop");
-			if(Game.hitWallCheck(Game.player)){
+			if(Game.hitWallCheck(Game.player) || Game.player.crashWith(Game.backBlock)){
 				Game.player.y = Game.player.y + 20;
 				move("stop");
 			}else if(Game.Entities.checkHit(Game.player)){
 				var other = Game.Entities.getEntity(Game.getPlayerX(),Game.getPlayerY());
-				Game.player.takeDamage(other.damagePerHit);
+				Game.Dialog.combat();
 				Game.player.dealDamage(other);
 				Game.player.y = Game.player.y + 20;
 				move("stop");
@@ -130,46 +134,69 @@ function Smoothmove(dir){
 		Game.player.speedY = 0;
 	}
 }
+Game.Controller = {};
+Game.Controller.inGame = function(inputData){
+	//This is the code for all the keybinds while in the game with nothing open like the inventory
+	//or the chest inventory, etc
+	//WASD mapping
+	if(inputData.keyCode === ROT.VK_W){
+		move("up");
+	}
+	
+	if(inputData.keyCode === ROT.VK_A){
+		move("left");
+	}
+	
+	if(inputData.keyCode === ROT.VK_S){
+		move("down");
+	}
+	
+	if(inputData.keyCode === ROT.VK_D){
+		move("right");
+	}
+	//Picking up Items
+	if(inputData.keyCode === ROT.VK_E){
+		if(Game.onDroppedItem()){
+			Game.player.pickUpItem();
+			Game.Dialog.hide();
+		}
+	}
+	//Inventory
+	if(inputData.keyCode === ROT.VK_I){
+		if(Game.getCurrentSubMenu.current == "none"){
+			Game.pause = true;
+			Game.openInventory();
+		}else{
+			Game.pause = false;
+			Game.closeInventory();
+		}
+	}
+	//Opening chests
+	if(inputData.keyCode === ROT.VK_F){
+		if(Game.getCurrentSubMenu.current == "none"){
+			if(Game.chestCheck()){
+				Game.pause = true;
+				Game.openChest(Game.getChest(Game.player.x,Game.player.y));
+			}
+		}else if(Game.getCurrentSubMenu.current == "chest"){
+			Game.pause = false;
+			Game.closeChest();
+		}
+	}
+	//END
+}
 /**
  *
  * Detects the input from a keyboard using ROT.MIN.JS
- * no need to call this, it automatically is called when a key event
+ * no need to call this, it automatically is called on a key event
  */
 Game.handleInput = function(inputType, inputData){
+	
 	if(!Game.isInMenu){
-		//If ingame and not in the menu
-		if(inputData.keyCode === ROT.VK_W){
-			move("up");
-		}else if(inputData.keyCode === ROT.VK_A){
-			move("left");
-		}else if(inputData.keyCode === ROT.VK_S){
-			move("down");
-		}else if(inputData.keyCode === ROT.VK_D){
-			move("right");
-		}else if(inputData.keyCode === ROT.VK_E){
-			Game.player.pickUpItem();
-		}else if(inputData.keyCode === ROT.VK_I){
-			if(Game.getCurrentSubMenu.current == "none"){
-				Game.pause = true;
-				Game.openInventory();
-			}else{
-				Game.pause = false;
-				Game.closeInventory();
-			}
-		}else if(inputData.keyCode === ROT.VK_F){
-			if(Game.getCurrentSubMenu.current == "none"){
-				if(Game.chestCheck()){
-					Game.pause = true;
-					Game.openChest(Game.getChest(Game.player.x,Game.player.y));
-				}
-			}else if(Game.getCurrentSubMenu.current == "chest"){
-				Game.pause = false;
-				Game.closeChest();
-			}
-			
-		}
-		//7 so far
-		if(Game.getCurrentSubMenu.current == "inventory"){
+		Game.Controller.inGame(inputData);
+	}
+	
+	if(Game.getCurrentSubMenu.current == "inventory"){
 			if(inputData.keyCode === ROT.VK_1){
 				if(Game.checkInventory(1) != null){
 					Game.player.useItem(1);
@@ -221,7 +248,6 @@ Game.handleInput = function(inputType, inputData){
 				}
 			}
 		}
-	}
 	if(Game.isInMenu){
 		//if in the Menu
 		if(inputData.keyCode === ROT.VK_W){
